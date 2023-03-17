@@ -1,12 +1,20 @@
 package com.demo.redditclone.service;
 
+import com.demo.redditclone.dto.AuthenticationResponse;
+import com.demo.redditclone.dto.LoginRequest;
 import com.demo.redditclone.dto.RegisterRequest;
+import com.demo.redditclone.exceptions.SpringRedditException;
 import com.demo.redditclone.model.NotificationEmail;
 import com.demo.redditclone.model.User;
 import com.demo.redditclone.model.VerificationToken;
 import com.demo.redditclone.repositories.UserRepository;
 import com.demo.redditclone.repositories.VerificationTokenRepository;
+import com.demo.redditclone.security.JwtProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +33,10 @@ public class AuthService {
     private final VerificationTokenRepository verificationTokenRepository;
 
     private final MailService mailService;
+
+   private final AuthenticationManager authenticationManager;
+
+   private final JwtProvider jwtProvider;
 
     @Transactional
     public void signup(RegisterRequest registerRequest) {
@@ -53,5 +65,27 @@ public class AuthService {
 
         verificationTokenRepository.save(verificationToken);
         return token;
+    }
+
+    public void verifyAccount(String token) {
+        VerificationToken verificationToken = verificationTokenRepository
+                .findByToken(token)
+                .orElseThrow(() -> new SpringRedditException("Invalid token"));
+        fetchUserAndEnabled(verificationToken);
+    }
+
+    @Transactional
+    private void fetchUserAndEnabled(VerificationToken verificationToken) {
+        String username = verificationToken.getUser().getUsername();
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new SpringRedditException("User not found - " + username));
+        user.setEnabled(true);
+        userRepository.save(user);
+    }
+
+    public AuthenticationResponse login(LoginRequest loginRequest) {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String token = jwtProvider.generateToken(authentication);
+        return new AuthenticationResponse(token, loginRequest.getUsername());
     }
 }
