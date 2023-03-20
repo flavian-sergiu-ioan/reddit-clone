@@ -1,7 +1,10 @@
 package com.demo.redditclone.service;
 
 import com.demo.redditclone.dto.SubredditDto;
+import com.demo.redditclone.exceptions.SpringRedditException;
+import com.demo.redditclone.mapper.SubredditMapper;
 import com.demo.redditclone.model.Subreddit;
+import com.demo.redditclone.model.User;
 import com.demo.redditclone.repositories.SubredditRepository;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -18,29 +21,25 @@ import java.util.stream.Collectors;
 public class SubredditService {
 
     private final SubredditRepository subredditRepository;
+    private final SubredditMapper subredditMapper;
+    private final AuthService authService;
 
     @Transactional
     public SubredditDto save(SubredditDto subredditDto) {
-        Subreddit subreddit =  subredditRepository.save(mapSubredditdto(subredditDto));
+        Subreddit subredditToSave = subredditMapper.mapDtoToEntity(subredditDto);
+        subredditToSave.setUser(authService.getCurrentUser());
+        Subreddit subreddit =  subredditRepository.save(subredditToSave);
         subredditDto.setId(subreddit.getId());
         return subredditDto;
     }
 
-    private Subreddit mapSubredditdto(SubredditDto subredditDto) {
-        return Subreddit.builder().name(subredditDto.getName()).description(subredditDto.getDescription()).build();
-    }
-
     @Transactional(readOnly = true)
     public List<SubredditDto> getAll() {
-        return subredditRepository.findAll().stream().map(this::mapToDto).collect(Collectors.toList());
+        return subredditRepository.findAll().stream().map(subredditMapper::mapEntityToDto).collect(Collectors.toList());
     }
 
-    private SubredditDto mapToDto(Subreddit subreddit) {
-        return SubredditDto.builder()
-                .name(subreddit.getName())
-                .description(subreddit.getDescription())
-                .id(subreddit.getId())
-                .numberOfPosts(subreddit.getPosts().size())
-                .build();
+    public SubredditDto getSubreddit(Long id) {
+        Subreddit subreddit = subredditRepository.findById(id).orElseThrow(() -> new SpringRedditException("No subreddit found for id -" + id));
+        return subredditMapper.mapEntityToDto(subreddit);
     }
 }
