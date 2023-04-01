@@ -16,7 +16,7 @@
                        autofocus>
                 <span *ngIf="!signupForm.get('email')?.valid && signupForm.get('email')?.touched">
                                     Please provide a valid email
-                 </span>
+                                </span>
               </div>
             </div>
 
@@ -36,7 +36,7 @@
                 <input type="password" [formControlName]="'password'" id="password" class="form-control" name="password" required>
                 <span *ngIf="!signupForm.get('password')?.valid && signupForm.get('password')?.touched">
                                     Please provide a valid Password
-                                </span>
+                </span>
               </div>
             </div>
 
