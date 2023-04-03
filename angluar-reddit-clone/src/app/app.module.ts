@@ -20,6 +20,8 @@ import { SubredditSideBarComponent } from './shared/subreddit-side-bar/subreddit
 import { CreateSubredditComponent } from './subreddit/create-subreddit/create-subreddit.component';
 import { ListSubredditsComponent } from './subreddit/list-subreddits/list-subreddits.component';
 import { EditorModule } from '@tinymce/tinymce-angular';
+import { ViewPostComponent } from './post/view-post/view-post.component';
+import { UserProfileComponent } from './auth/user-profile/user-profile.component';
 
 
 @NgModule({
@@ -35,7 +37,9 @@ import { EditorModule } from '@tinymce/tinymce-angular';
     SideBarComponent,
     SubredditSideBarComponent,
     CreateSubredditComponent,
-    ListSubredditsComponent
+    ListSubredditsComponent,
+    ViewPostComponent,
+    UserProfileComponent
   ],
   imports: [
     BrowserModule,
