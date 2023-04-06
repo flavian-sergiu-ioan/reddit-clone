@@ -15,7 +15,7 @@ export class CommentService {
     }
 
     postComment(commentPayload: CommentPayload): Observable<any> {
-      return this.httpClient.post<any>('http://localhost:8080/api/comments/', commentPayload);
+      return this.httpClient.post<any>('http://localhost:8080/api/comments', commentPayload);
     }
 
     getAllCommentsByUser(name: string) {
