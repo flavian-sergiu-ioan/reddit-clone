@@ -16,7 +16,6 @@ export class PostService {
   }
 
   createPost(postPayload: CreatePostPayload): Observable<any> {
-         console.log("a intrat 2");
     return this.http.post('http://localhost:8080/api/posts', postPayload);
   }
 

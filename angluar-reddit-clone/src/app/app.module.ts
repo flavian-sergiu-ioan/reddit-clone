@@ -22,6 +22,7 @@ import { ListSubredditsComponent } from './subreddit/list-subreddits/list-subred
 import { EditorModule } from '@tinymce/tinymce-angular';
 import { ViewPostComponent } from './post/view-post/view-post.component';
 import { UserProfileComponent } from './auth/user-profile/user-profile.component';
+import { TokenInterceptor } from './token-interceptor';
 
 
 @NgModule({
@@ -52,7 +53,13 @@ import { UserProfileComponent } from './auth/user-profile/user-profile.component
     FontAwesomeModule,
     EditorModule
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TokenInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
