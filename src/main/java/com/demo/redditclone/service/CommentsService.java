@@ -2,6 +2,7 @@ package com.demo.redditclone.service;
 
 import com.demo.redditclone.dto.CommentsDto;
 import com.demo.redditclone.exceptions.PostNotFoundException;
+import com.demo.redditclone.exceptions.SpringRedditException;
 import com.demo.redditclone.mapper.CommentMapper;
 import com.demo.redditclone.model.Comment;
 import com.demo.redditclone.model.NotificationEmail;
@@ -51,5 +52,12 @@ public class CommentsService {
     public List<CommentsDto> getAllCommentsForUser(String userName) {
         User user = userRepository.findByUsername(userName).orElseThrow(() -> new UsernameNotFoundException("User not found with name " + userName));
         return commentRepository.findAllByUser(user).stream().map(commentMapper::mapToDto).collect(Collectors.toList());
+    }
+
+    public boolean containsSwearWords(String comment) {
+        if (comment.contains("shit")) {
+            throw new SpringRedditException("Comments contains unacceptable language");
+        }
+        return false;
     }
 }
